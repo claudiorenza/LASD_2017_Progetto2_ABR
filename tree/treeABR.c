@@ -2,16 +2,20 @@
 
 //Inserimento del nodo nell'albero, in maniera efficiente
 void treeABR_insertKey_ver2(TREE T, int key)	{
-	if(*T)	{		//se la "scatola" ha qualcosa al suo interno
+	if(*T)	{		//se la "scatola" ha qualcosa dentro
 		if(key < (*T)->elem)	//confronto il valore 'key' con quello presente al suo interno
-			treeABR_insertKey(&(*T)->sx, key);	//se 'key' è più piccolo, scendo a sinistra
+			treeABR_insertKey_ver2(&(*T)->sx, key);	//se 'key' è più piccolo, scendo a sinistra
 		else if(key > (*T)->elem)
-			treeABR_insertKey(&(*T)->dx, key);	//altrimenti, a destra
+			treeABR_insertKey_ver2(&(*T)->dx, key);	//altrimenti, a destra
 		else	{	//se sono uguali
-			printf("DEBUG: valori uguali\n")
-			(*T)->sx = *T;	//CHECK: metto momentaneamente l'attuale radice al sottoalbero sinistro
-			*T = treeABR_createNode(key);	//e metto il nuovo uguale valore nella stessa posizione
-		}	//in questo modo non è necessario scorrere il resto dell'albero fino alle foglie
+			printf("DEBUG: valori uguali\n");
+			if(!((*T)->sx))	//se trovo un sottoalbero vuoto a sinistra, inserisco lì il valore duplicato
+				(*T)->sx = treeABR_createNode(key);
+			else if(!((*T)->dx))	//altrimenti a destra
+				(*T)->dx = treeABR_createNode(key);
+			else	//continuo la visita all'interno del sottoalbero sinistro
+				treeABR_insertKey_ver2(&(*T)->sx, key);
+		}
 	} else	//se non c'è niente dentro la "scatola"
 		*T = treeABR_createNode(key);
 }
@@ -99,4 +103,16 @@ int treeABR_inOrder(TREE T, int i)	{
 		return treeABR_inOrder(&(*T)->dx, i);
 	}
 	return i;
+}
+
+int treeABR_postOrder_h(TREE T, int h_local)	{
+	if(*T)	{
+		int h_sx = treeABR_postOrder_h(&(*T)->sx, h_local+1);
+		int h_dx = treeABR_postOrder_h(&(*T)->dx, h_local+1);
+		if(h_sx > h_dx)
+			return h_sx;
+		else
+			return h_dx;
+	}
+	return h_local-1;
 }

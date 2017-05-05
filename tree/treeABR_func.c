@@ -84,7 +84,7 @@ void treeABR_func_generate(TREE albero) {
 	}while(n_elem < 1);
 
     for(idx=0;idx<n_elem;idx++)
-        treeABR_insertKey(albero, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
+        treeABR_insertKey_ver2(albero, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
     printf("\n");
     treeABR_func_print(albero);
 }
@@ -98,7 +98,7 @@ void treeABR_func_insertKey(TREE albero)   {
             printf("ATTENZIONE: Valore non valido\n\n");
     }while(val < 1);
 
-    treeABR_insertKey(albero, val);
+    treeABR_insertKey_ver2(albero, val);
     printf("\n");
     treeABR_func_print(albero);
 }
@@ -139,4 +139,5 @@ void treeABR_func_delete(TREE albero)  {
 //Stampa dell'Albero
 void treeABR_func_print(TREE albero)  {
     printf("\tNumero elementi: %d\n", treeABR_inOrder(albero, 0));
+    printf("\tAltezza massima: %d\n", treeABR_postOrder_h(albero, 0));
 }

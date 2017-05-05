@@ -13,7 +13,7 @@ struct Albero   {
 typedef struct Albero ** TREE;
 typedef struct Albero * TREEel;
 
-void treeABR_insertKey(TREE T, int key);
+void treeABR_insertKey_ver2(TREE T, int key);
 TREEel treeABR_createNode(int key);
 
 void treeABR_delete(TREE T);
@@ -25,5 +25,7 @@ TREEel treeABR_staccaMin(TREE T, TREE P);
 void treeABR_nodeFree(TREEel T_curr);
 
 int treeABR_inOrder(TREE T, int i);
+
+int treeABR_postOrder_h(TREE T, int h_local);
 
 #endif
