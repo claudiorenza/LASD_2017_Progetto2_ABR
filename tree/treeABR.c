@@ -1,20 +1,20 @@
 #include "treeABR.h"
 
 //Inserimento del nodo nell'albero, in maniera efficiente
-void treeABR_insertKey_ver2(TREE T, int key)	{
+void treeABR_insertKey_v2(TREE T, int key)	{
 	if(*T)	{		//se la "scatola" ha qualcosa dentro
 		if(key < (*T)->elem)	//confronto il valore 'key' con quello presente al suo interno
-			treeABR_insertKey_ver2(&(*T)->sx, key);	//se 'key' è più piccolo, scendo a sinistra
+			treeABR_insertKey_v2(&(*T)->sx, key);	//se 'key' è più piccolo, scendo a sinistra
 		else if(key > (*T)->elem)
-			treeABR_insertKey_ver2(&(*T)->dx, key);	//altrimenti, a destra
+			treeABR_insertKey_v2(&(*T)->dx, key);	//altrimenti, a destra
 		else	{	//se sono uguali
-			printf("DEBUG: valori uguali\n");
+			//printf("DEBUG: valori uguali\n");
 			if(!((*T)->sx))	//se trovo un sottoalbero vuoto a sinistra, inserisco lì il valore duplicato
 				(*T)->sx = treeABR_createNode(key);
 			else if(!((*T)->dx))	//altrimenti a destra
 				(*T)->dx = treeABR_createNode(key);
 			else	//continuo la visita all'interno del sottoalbero sinistro
-				treeABR_insertKey_ver2(&(*T)->sx, key);
+				treeABR_insertKey_v2(&(*T)->sx, key);
 		}
 	} else	//se non c'è niente dentro la "scatola"
 		*T = treeABR_createNode(key);
@@ -92,6 +92,27 @@ void treeABR_nodeFree(TREEel T_curr)	{
 	T_curr->sx = NULL;
 	T_curr->dx = NULL;
 	free(T_curr);	//libero la "scatola"
+}
+
+void treeABR_calcAverage(int n_trees, int n_nodes_A, int n_nodes_B)	{
+	int idx_trees, idx_nodes, h_sum = 0, n_nodes, n_nodes_sum = 0;
+	TREEel albero = NULL;
+	for(idx_trees=0;idx_trees<n_trees;idx_trees++)	{	//ciclo per il numero di alberi
+		if(n_nodes_B)		//se ho stabilito un margine massimo del numero di nodi
+			n_nodes_sum = n_nodes_sum + (n_nodes = random_num(n_nodes_A, n_nodes_B));	//genero un valore casuale di nodi compreso tra A e B
+		else
+			n_nodes = n_nodes_A;
+		for(idx_nodes=0;idx_nodes<n_nodes;idx_nodes++)	//inserisco n_nodes_A nodi
+			treeABR_insertKey_v2(&albero, random_num(1, n_nodes_A));	//inserisce un valore casuale compreso fra 1 e n_nodes_A
+		//IMPORTANTE: è possibile calcolare l'altezza massima ogni volta che si inserice un nuovo nodo nell'albero,
+		//risparmiando una nuova visita di tutti i nodi (O(n))
+		h_sum = h_sum + treeABR_postOrder_h(&albero, 0);
+		treeABR_delete(&albero);
+	}
+	printf("\n\n");
+	if(n_nodes_B)
+		printf("Numero medio di nodi negli alberi: %.3f\n", (float)n_nodes_sum / (float)n_trees);
+	printf("Altezza media degli alberi: %.3f\n\n", (float)h_sum / (float)n_trees);
 }
 
 //Visita in ordine di un albero con contatore del numero dei nodi

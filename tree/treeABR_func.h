@@ -7,13 +7,13 @@
 #include "../io/random.h"
 #include "treeABR.h"
 
-#define MAX_tree 256
-
 typedef struct Albero ** TREE;
 
 void treeABR_func_main();
 
 int treeABR_func_menu(TREE albero);
+
+void treeABR_func_average();
 
 void treeABR_func_generate(TREE albero);
 

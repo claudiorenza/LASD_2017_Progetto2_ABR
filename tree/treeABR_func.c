@@ -28,17 +28,16 @@ void treeABR_func_main()  {
 				printf("CANCELLAZIONE COMPLETA DELL'ALBERO\n\n");
 				treeABR_func_delete(&albero);
 				break;
-            case 6:
-				printf("SESSIONE TERMINATA\n\n");
 		}
-		io_pressKey();
+        if(choiceMenu != 6)
+		    io_pressKey();
 	}while(choiceMenu != 6);
 }
 
 //Interfaccia utente
 int treeABR_func_menu(TREE albero)	{
 	int choiceMenu;
-	printf("\t\t\tStack - MENU PRINCIPALE\n");
+	printf("\t\t\tAlbero - MENU PRINCIPALE\n");
 	printf("1. Genera Albero\n");
 	printf("2. Inserisci nuovo elemento nell'Albero\n");
     if(*albero)    {   //se l'Albero esiste, mostro gli altri elementi del menu
@@ -47,7 +46,7 @@ int treeABR_func_menu(TREE albero)	{
         printf("5. Cancella completamente l'Albero");
     }
     printf("\n");
-    printf("6. Esci\n");
+    printf("6. Torna al Menu Introduttivo\n");
     printf("\n\n");
 	do {
 		printf("SCELTA: ");
@@ -58,6 +57,44 @@ int treeABR_func_menu(TREE albero)	{
 	return choiceMenu;
 }
 
+
+//Funzione prinicpale dell'Albero
+void treeABR_func_average()  {
+	int n_trees, n_nodes_A = 0, n_nodes_B = 0, choiceMode;
+    do  {
+        printf("Quanti alberi vuoi generare?: ");
+        if((n_trees = io_getInteger()) < 1)
+            printf("ATTENZIONE: Valore non valido\n\n");
+    }while(n_trees < 1);
+    printf("\n");
+    do  {
+        printf("Numero fisso o numero variabile di nodi fra gli alberi?\n\t1. Fisso\t2. Variabile: ");
+        if((choiceMode = io_getInteger()) < 1 || choiceMode > 2)
+            printf("ATTENZIONE: Valore non valido\n\n");
+    }while(choiceMode < 1 || choiceMode > 2);
+    printf("\n");
+    if(choiceMode == 1) {
+        do  {
+            printf("Quanti nodi vuoi inserire negli alberi?: ");
+            if((n_nodes_A = io_getInteger()) < 1)
+                printf("ATTENZIONE: Valore non valido\n\n");
+        }while(n_nodes_A < 1);
+    } else if(choiceMode == 2)  {
+        do  {
+            printf("Quale numero MINIMO di nodi vuoi inserire negli alberi?: ");
+            if((n_nodes_A = io_getInteger()) < 1)
+                printf("ATTENZIONE: Valore non valido\n\n");
+        }while(n_nodes_A < 1);
+        printf("\n");
+        do  {
+            printf("Quale numero MASSIMO di nodi vuoi inserire negli alberi?: ");
+            if((n_nodes_B = io_getInteger()) < n_nodes_A)
+                printf("ATTENZIONE: Valore non valido\n\n");
+        }while(n_nodes_B < n_nodes_A);
+    }
+    treeABR_calcAverage(n_trees, n_nodes_A, n_nodes_B);
+
+}
 //Generazione di un'Albero con valori randomici
 void treeABR_func_generate(TREE albero) {
     int idx, n_elem;
@@ -84,7 +121,7 @@ void treeABR_func_generate(TREE albero) {
 	}while(n_elem < 1);
 
     for(idx=0;idx<n_elem;idx++)
-        treeABR_insertKey_ver2(albero, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
+        treeABR_insertKey_v2(albero, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
     printf("\n");
     treeABR_func_print(albero);
 }
@@ -98,7 +135,7 @@ void treeABR_func_insertKey(TREE albero)   {
             printf("ATTENZIONE: Valore non valido\n\n");
     }while(val < 1);
 
-    treeABR_insertKey_ver2(albero, val);
+    treeABR_insertKey_v2(albero, val);
     printf("\n");
     treeABR_func_print(albero);
 }

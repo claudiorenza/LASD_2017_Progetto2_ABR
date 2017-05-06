@@ -25,9 +25,9 @@ OBJ = $(SRC:.c=.o)
 default: all
 
 all: $(OBJ)
-	$(CC) $(CCFLAGS) $(SRC) -o mainLib main.c
+	$(CC) $(CCFLAGS) $(SRC) -o treeLib main.c
 	@echo "Build complete"
 
 clean:
-	$(RM) *.dSYM stack/*.o queue/*.o tree/*.o io/*.o *.o mainLib
+	$(RM) *.dSYM tree/*.o io/*.o *.o treeLib
 	@echo "Clean complete"
