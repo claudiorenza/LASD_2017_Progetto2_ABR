@@ -28,10 +28,18 @@ void treeABR_func_main()  {
 				printf("CANCELLAZIONE COMPLETA DELL'ALBERO\n\n");
 				treeABR_func_delete(&albero);
 				break;
+            case 6:
+				printf("ROTAZIONE DELL'ALBERO\n\n");
+				treeABR_func_rotate(&albero);  //aggiorno il riferimento alla nuova radice dell'albero ruotato
+				break;
+            case 7:
+				printf("BILANCIAMENTO DELL'ALBERO\n\n");
+				treeABR_func_balance(&albero);
+				break;
 		}
-        if(choiceMenu != 6)
+        if(choiceMenu != 8)
 		    io_pressKey();
-	}while(choiceMenu != 6);
+	}while(choiceMenu != 8);
 }
 
 //Interfaccia utente
@@ -42,17 +50,19 @@ int treeABR_func_menu(TREE albero)	{
 	printf("2. Inserisci nuovo elemento nell'Albero\n");
     if(*albero)    {   //se l'Albero esiste, mostro gli altri elementi del menu
         printf("3. Stampa Albero\n");
-        printf("4. Cancello elemento nell'Albero\n");
-        printf("5. Cancella completamente l'Albero");
+        printf("4. Cancella elemento nell'Albero\n");
+        printf("5. Cancella completamente l'Albero\n");
+        printf("6. Ruota sottoalbero nell'Albero\n");
+        printf("7. Bilancia l'Albero");
     }
     printf("\n");
-    printf("6. Torna al Menu Introduttivo\n");
+    printf("8. Torna al Menu Introduttivo\n");
     printf("\n\n");
 	do {
 		printf("SCELTA: ");
-		if(((choiceMenu = io_getInteger()) < 1 || choiceMenu > 6) || (!*albero && (choiceMenu > 2 && choiceMenu < 6))) //nel caso l'utente inserisca una scelta del menu non presente
+		if(((choiceMenu = io_getInteger()) < 1 || choiceMenu > 8) || (!*albero && (choiceMenu > 2 && choiceMenu < 8))) //nel caso l'utente inserisca una scelta del menu non presente
 			printf("ATTENZIONE: Valore non valido\n\n");
-	}while((choiceMenu < 1 || choiceMenu > 6) || (!*albero && (choiceMenu > 2 && choiceMenu < 6)));
+	}while((choiceMenu < 1 || choiceMenu > 8) || (!*albero && (choiceMenu > 2 && choiceMenu < 8)));
     io_clearScreen();   //pulizia dello schermo del terminale
 	return choiceMenu;
 }
@@ -97,29 +107,81 @@ void treeABR_func_average()  {
 
 //Calcolo altezza media di sequenza di Alberi
 void treeABR_func_merge()  {
-	TREEel T1 = NULL;
-    TREEel T2 = NULL;
+	TREEel albero1 = NULL;
+    TREEel albero2 = NULL;
     int idx;
-    for(idx=0;idx<random_num(10, 30);idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in T1
-        treeABR_insertKey_v2(&T1, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
+    for(idx=0;idx<random_num(10, 30);idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in albero1
+        treeABR_insertKey_v2(&albero1, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
 
-    for(idx=0;idx<random_num(10, 30);idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in T2
-        treeABR_insertKey_v2(&T2, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
+    for(idx=0;idx<random_num(10, 30);idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in albero2
+        treeABR_insertKey_v2(&albero2, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
 
-    printf("\tALBERO T1\n");
-    treeABR_func_print(&T1); //stampa dell'albero T1
+    printf("\tALBERO albero1\n");
+    treeABR_func_print(&albero1); //stampa dell'albero albero1
     printf("\n\n");
-    printf("\tALBERO T2\n");
-    treeABR_func_print(&T2); //e T2
+    printf("\tALBERO albero2\n");
+    treeABR_func_print(&albero2); //e albero2
     printf("\n\n");
 
     printf("Alberi pronti per il Merge\n");
     io_pressKey();  //premo invio per incominciare il Merge
 
-    treeABR_merge(&T1, &T2);
+    treeABR_merge(&albero1, &albero2);
 
-    printf("\tALBERO T1 unito\n");
-    treeABR_func_print(&T1); //stampa dell'albero T1 unito
+    printf("\tALBERO albero1 unito\n");
+    treeABR_func_print(&albero1); //stampa dell'albero albero1 unito
+}
+
+
+//Rotazione dell'albero con restituzione del riferimento alla nuova radice
+void treeABR_func_rotate(TREE albero)  {
+    int choice;
+    int n_rot;
+    treeABR_func_print(albero); //stampa dell'albero
+    printf("\tRadice: %d\n\n", (*albero)->elem);
+    printf("In quale direzione vuoi ruotare l'albero?\n\t1. Sinistra\t2. Destra\n\n");
+    do  {
+        printf("SCELTA: ");
+        if((choice = io_getInteger()) < 1 || choice > 2)
+            printf("ATTENZIONE: Valore non valido\n\n");
+    }while(choice < 1 || choice > 2);
+
+    if((choice == 1 && !((*albero)->dx)) || (choice == 2 && !((*albero)->sx))) {
+        printf("ATTENZIONE: non è possibile effettuare la rotazione a ");
+        if(choice == 1)
+            printf("Sinistra\n\n");
+        else if(choice == 2)
+            printf("Destra\n\n");
+    } else {
+        do  {
+            printf("Quante rotazioni a ");
+            if(choice == 1)
+                printf("Sinistra ");
+            else if(choice == 2)
+                printf("Destra ");
+            printf("vuoi effettuare?: ");
+            if((n_rot = io_getInteger()) < 1)
+                printf("ATTENZIONE: Valore non valido\n\n");
+        }while(n_rot < 1);
+        int idx_rot;
+        for(idx_rot=0;idx_rot<n_rot;idx_rot++)  {
+            if(choice == 1 && (*albero)->dx) 
+                treeABR_rotate_SX(albero);
+            else if(choice == 2 && (*albero)->sx)  
+                treeABR_rotate_DX(albero);
+            else    {
+                printf("ATTENZIONE: Limite albero raggiunto\n\n");
+                break;
+            }
+            printf("\tNuova Radice: %d\n\n", (*albero)->elem);
+        }
+    }
+}
+
+//Bilanciamento dell'Albero
+void treeABR_func_balance(TREE albero)  {
+
+
 }
 
 //Generazione di un'Albero con valori randomici

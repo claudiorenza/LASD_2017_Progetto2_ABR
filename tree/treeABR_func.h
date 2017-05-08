@@ -15,6 +15,10 @@ int treeABR_func_menu(TREE albero);
 
 void treeABR_func_average();
 
+void treeABR_func_rotate(TREE albero);
+
+void treeABR_func_balance(TREE albero);
+
 void treeABR_func_merge();
 
 void treeABR_func_generate(TREE albero);

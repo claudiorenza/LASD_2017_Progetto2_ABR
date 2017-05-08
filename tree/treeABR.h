@@ -19,24 +19,27 @@ struct Albero   {
 typedef struct Albero ** TREE;
 typedef struct Albero * TREEel;
 
-void treeABR_insertKey_v2(TREE T, int key);
+void treeABR_insertKey_v2(TREE albero, int key);
 TREEel treeABR_createNode(int key);
 
-void treeABR_delete(TREE T);
+void treeABR_delete(TREE albero);
 
-void treeABR_deleteKey(TREE T, int key);
+void treeABR_deleteKey(TREE albero, int key);
 
-TREEel treeABR_staccaMin(TREE T, TREE P);
+TREEel treeABR_staccaMin(TREE albero, TREE P);
 
-void treeABR_nodeFree(TREEel T_curr);
+void treeABR_nodeFree(TREEel albero_curr);
 
 void treeABR_average(int n_trees, int n_nodes_A, int n_nodes_B);
 
-void treeABR_merge(TREE T1, TREE T2);
-void treeABR_insertKey_merge(TREE T, TREEel node);
+void treeABR_merge(TREE albero1, TREE albero2);
+void treeABR_insertKey_merge(TREE albero, TREEel node);
 
-int treeABR_inOrder(TREE T, int i);
+void treeABR_rotate_SX(TREE albero);
+void treeABR_rotate_DX(TREE albero);
 
-int treeABR_postOrder_h(TREE T, int h_local);
+int treeABR_inOrder(TREE albero, int i);
+
+int treeABR_postOrder_h(TREE albero, int h_local);
 
 #endif
