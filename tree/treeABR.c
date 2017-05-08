@@ -94,7 +94,9 @@ void treeABR_nodeFree(TREEel T_curr)	{
 	free(T_curr);	//libero la "scatola"
 }
 
-void treeABR_calcAverage(int n_trees, int n_nodes_A, int n_nodes_B)	{
+
+//Calcolo altezza media per alberi molteplici
+void treeABR_average(int n_trees, int n_nodes_A, int n_nodes_B)	{
 	int idx_trees, idx_nodes, h_sum = 0, n_nodes, n_nodes_sum = 0;
 	TREEel albero = NULL;
 	for(idx_trees=0;idx_trees<n_trees;idx_trees++)	{	//ciclo per il numero di alberi
@@ -113,6 +115,38 @@ void treeABR_calcAverage(int n_trees, int n_nodes_A, int n_nodes_B)	{
 	if(n_nodes_B)
 		printf("Numero medio di nodi negli alberi: %.3f\n", (float)n_nodes_sum / (float)n_trees);
 	printf("Altezza media degli alberi: %.3f\n\n", (float)h_sum / (float)n_trees);
+}
+
+//Unione di due alberi
+void treeABR_merge(TREE T1, TREE T2)	{
+	if(*T2)	{
+		treeABR_merge(T1, &(*T2)->sx);
+		treeABR_merge(T1, &(*T2)->dx);	//scorro in postOrder l'albero per visitare le foglie e mai i nodi interni per trasferire i nodi e non sottoalberi
+
+		(*T2)->sx = NULL;	//tolgo i vecchi riferimenti ai figli
+		(*T2)->dx = NULL;
+		treeABR_insertKey_merge(T1, *T2);	//inserisce il nodo partendo dalla radice di T1
+	}
+}
+
+
+//Inserimento del nodo nell'albero per il merge, senza nuova allocazione
+void treeABR_insertKey_merge(TREE T, TREEel node)	{
+	if(*T)	{		//se la "scatola" ha qualcosa dentro
+		if(node->elem < (*T)->elem)	//confronto il valore 'node' con quello presente al suo interno
+			treeABR_insertKey_merge(&(*T)->sx, node);	//se 'node' è più piccolo, scendo a sinistra
+		else if(node->elem > (*T)->elem)
+			treeABR_insertKey_merge(&(*T)->dx, node);	//altrimenti, a destra
+		else	{	//se sono uguali
+			if(!((*T)->sx))	//se trovo un sottoalbero vuoto a sinistra, inserisco lì il valore duplicato
+				(*T)->sx = node;
+			else if(!((*T)->dx))	//altrimenti a destra
+				(*T)->dx = node;
+			else	//continuo la visita all'interno del sottoalbero sinistro
+				treeABR_insertKey_merge(&(*T)->sx, node);
+		}
+	} else		//se non c'è niente dentro la "scatola"
+		*T = node;
 }
 
 //Visita in ordine di un albero con contatore del numero dei nodi

@@ -58,7 +58,7 @@ int treeABR_func_menu(TREE albero)	{
 }
 
 
-//Funzione prinicpale dell'Albero
+//Calcolo altezza media di sequenza di Alberi
 void treeABR_func_average()  {
 	int n_trees, n_nodes_A = 0, n_nodes_B = 0, choiceMode;
     do  {
@@ -92,9 +92,36 @@ void treeABR_func_average()  {
                 printf("ATTENZIONE: Valore non valido\n\n");
         }while(n_nodes_B < n_nodes_A);
     }
-    treeABR_calcAverage(n_trees, n_nodes_A, n_nodes_B);
-
+    treeABR_average(n_trees, n_nodes_A, n_nodes_B);
 }
+
+//Calcolo altezza media di sequenza di Alberi
+void treeABR_func_merge()  {
+	TREEel T1 = NULL;
+    TREEel T2 = NULL;
+    int idx;
+    for(idx=0;idx<random_num(10, 30);idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in T1
+        treeABR_insertKey_v2(&T1, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
+
+    for(idx=0;idx<random_num(10, 30);idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in T2
+        treeABR_insertKey_v2(&T2, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
+
+    printf("\tALBERO T1\n");
+    treeABR_func_print(&T1); //stampa dell'albero T1
+    printf("\n\n");
+    printf("\tALBERO T2\n");
+    treeABR_func_print(&T2); //e T2
+    printf("\n\n");
+
+    printf("Alberi pronti per il Merge\n");
+    io_pressKey();  //premo invio per incominciare il Merge
+
+    treeABR_merge(&T1, &T2);
+
+    printf("\tALBERO T1 unito\n");
+    treeABR_func_print(&T1); //stampa dell'albero T1 unito
+}
+
 //Generazione di un'Albero con valori randomici
 void treeABR_func_generate(TREE albero) {
     int idx, n_elem;
