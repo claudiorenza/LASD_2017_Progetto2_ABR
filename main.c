@@ -19,9 +19,9 @@ int main()  {
 		printf("\n\n");
 		do {
 			printf("SCELTA: ");
-			if((choiceMenu = io_getInteger()) < 1 || choiceMenu > 3) //nel caso l'utente inserisca una scelta del menu non presente
+			if((choiceMenu = io_getInteger()) < 1 || choiceMenu > 4) //nel caso l'utente inserisca una scelta del menu non presente
 				printf("ATTENZIONE: Valore non valido\n\n");
-		}while(choiceMenu < 1 || choiceMenu > 3);
+		}while(choiceMenu < 1 || choiceMenu > 4);
 		io_clearScreen();
 		switch(choiceMenu)	{
 			case 1:
@@ -40,7 +40,7 @@ int main()  {
 				printf("SESSIONE TERMINATA\n\n");
 		}
 		io_pressKey();
-	}while(choiceMenu != 3);
+	}while(choiceMenu != 4);
 
 	io_clearScreen();
 	return 1;
