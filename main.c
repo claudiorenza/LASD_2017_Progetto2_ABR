@@ -14,7 +14,7 @@ int main()  {
 
 		printf("1. Calcolo altezza media degli alberi\n");
 		printf("2. Merge di due alberi\n");
-		printf("3. Gestione singolo albero (Esercizio Rotazione)\n");
+		printf("3. Gestione singolo albero (Esercizio Rotazione e Bilanciamento)\n");
 		printf("4. Esci\n");
 		printf("\n\n");
 		do {
@@ -39,7 +39,8 @@ int main()  {
 				printf("\n");
 				printf("SESSIONE TERMINATA\n\n");
 		}
-		io_pressKey();
+		if(choiceMenu != 3)	//non premo invio quando torno al menu introduttivo dopo aver lavorato su treeABR_func_main
+			io_pressKey();
 	}while(choiceMenu != 4);
 
 	io_clearScreen();

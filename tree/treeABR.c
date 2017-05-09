@@ -1,6 +1,20 @@
 #include "treeABR.h"
 
 //Inserimento del nodo nell'albero, in maniera efficiente
+inthgn  kuiu treeABR_insertKey_v1(TREE albero, int key)	{
+	if(*albero)	{		//se la "scatola" ha qualcosa dentro
+		if(key < (*albero)->elem)	//confronto il valore 'key' con quello presente al suo interno
+			treeABR_insertKey_v2(&(*albero)->sx, key);	//se 'key' è più piccolo, scendo a sinistra
+		else if(key > (*albero)->elem)
+			treeABR_insertKey_v2(&(*albero)->dx, key);	//altrimenti, a destra
+		else	
+			return 0;
+	} else	//se non c'è niente dentro la "scatola"
+		*albero = treeABR_createNode(key);
+	return 1;
+}
+
+//Inserimento del nodo nell'albero con nodi uguali, in maniera efficiente
 void treeABR_insertKey_v2(TREE albero, int key)	{
 	if(*albero)	{		//se la "scatola" ha qualcosa dentro
 		if(key < (*albero)->elem)	//confronto il valore 'key' con quello presente al suo interno
@@ -108,7 +122,8 @@ void treeABR_average(int n_trees, int n_nodes_A, int n_nodes_B)	{
 			treeABR_insertKey_v2(&albero, random_num(1, n_nodes_A));	//inserisce un valore casuale compreso fra 1 e n_nodes_A
 		//IMPORTANTE: è possibile calcolare l'altezza massima ogni volta che si inserice un nuovo nodo nell'albero,
 		//risparmiando una nuova visita di tutti i nodi (O(n))
-		h_sum = h_sum + treeABR_postOrder_h(&albero, 0);
+		treeABR_postOrder_h(&albero);
+		h_sum = h_sum + albero->h;
 		treeABR_delete(&albero);
 	}
 	printf("\n\n");
@@ -171,21 +186,27 @@ void treeABR_rotate_DX(TREE albero)	{
 int treeABR_inOrder(TREE albero, int i)	{
 	if(*albero)	{
 		i = treeABR_inOrder(&(*albero)->sx, i);
-		printf("%d\n", (*albero)->elem);
+		printf("%d [h: %d]\n", (*albero)->elem, (*albero)->h);
 		i++;
 		return treeABR_inOrder(&(*albero)->dx, i);
 	}
 	return i;
 }
 
-int treeABR_postOrder_h(TREE albero, int h_local)	{
+//Assegnamento delle altezze in postOrder
+void treeABR_postOrder_h(TREE albero)	{
 	if(*albero)	{
-		int h_sx = treeABR_postOrder_h(&(*albero)->sx, h_local+1);
-		int h_dx = treeABR_postOrder_h(&(*albero)->dx, h_local+1);
-		if(h_sx > h_dx)
-			return h_sx;
-		else
-			return h_dx;
+		treeABR_postOrder_h(&(*albero)->sx);
+		treeABR_postOrder_h(&(*albero)->dx);
+		(*albero)->h = treeABR_h_max(albero) + 1;
 	}
-	return h_local-1;
+}
+
+int treeABR_h_max(TREE albero)	{
+	if(((*albero)->sx && !(*albero)->dx) || (((*albero)->sx && (*albero)->dx) && ((*albero)->sx->h > (*albero)->dx->h)))
+		return (*albero)->sx->h;
+	else if((!(*albero)->sx && (*albero)->dx) || (((*albero)->sx && (*albero)->dx) && ((*albero)->sx->h <= (*albero)->dx->h)))
+		return (*albero)->dx->h;
+	else
+		return -1;
 }

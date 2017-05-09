@@ -40,6 +40,7 @@ void treeABR_func_main()  {
         if(choiceMenu != 8)
 		    io_pressKey();
 	}while(choiceMenu != 8);
+    treeABR_delete(&albero);   //dealloco l'albero quando esco
 }
 
 //Interfaccia utente
@@ -180,8 +181,11 @@ void treeABR_func_rotate(TREE albero)  {
 
 //Bilanciamento dell'Albero
 void treeABR_func_balance(TREE albero)  {
+    treeABR_func_print(albero); //stampa dell'albero
+    printf("Albero pronto per il bilanciamento\n");
+    io_pressKey();  //premo invio per incominciare il Merge
 
-
+    //treeABR_balance(albero);
 }
 
 //Generazione di un'Albero con valori randomici
@@ -264,6 +268,7 @@ void treeABR_func_delete(TREE albero)  {
 
 //Stampa dell'Albero
 void treeABR_func_print(TREE albero)  {
-    printf("\tNumero elementi: %d\n", treeABR_inOrder(albero, 0));
-    printf("\tAltezza massima: %d\n", treeABR_postOrder_h(albero, 0));
+    treeABR_postOrder_h(albero); //aggiornamento delle altezze
+    printf("\tNumero elementi: %d\n", treeABR_inOrder(albero, 0));  //stampa ordinata e conteggio nodi
+    printf("\tAltezza massima: %d\n", (*albero)->h);
 }

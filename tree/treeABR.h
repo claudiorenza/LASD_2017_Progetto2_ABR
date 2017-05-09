@@ -12,6 +12,7 @@
 
 struct Albero   {
     int elem;
+    int h;
     struct Albero *sx;
     struct Albero *dx;
 };
@@ -19,6 +20,8 @@ struct Albero   {
 typedef struct Albero ** TREE;
 typedef struct Albero * TREEel;
 
+
+void treeABR_insertKey_v1(TREE albero, int key);
 void treeABR_insertKey_v2(TREE albero, int key);
 TREEel treeABR_createNode(int key);
 
@@ -40,6 +43,7 @@ void treeABR_rotate_DX(TREE albero);
 
 int treeABR_inOrder(TREE albero, int i);
 
-int treeABR_postOrder_h(TREE albero, int h_local);
+void treeABR_postOrder_h(TREE albero);
+int treeABR_h_max(TREE albero);
 
 #endif
