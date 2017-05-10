@@ -106,16 +106,16 @@ void treeABR_func_average()  {
     treeABR_average(n_trees, n_nodes_A, n_nodes_B);
 }
 
-//Calcolo altezza media di sequenza di Alberi
+//Unione di due alberi, con eliminazione di elementi duplicati
 void treeABR_func_merge()  {
 	TREEel albero1 = NULL;
     TREEel albero2 = NULL;
     int idx;
     for(idx=0;idx<random_num(10, 30);idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in albero1
-        treeABR_insertKey_v2(&albero1, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
+        while(treeABR_insertKey(&albero1, random_num(1, MAX_tree)));	//inserisce un numero casuale compreso fra 1 e MAX_tree, senza inserimento di duplicati
 
     for(idx=0;idx<random_num(10, 30);idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in albero2
-        treeABR_insertKey_v2(&albero2, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
+        while(treeABR_insertKey(&albero2, random_num(1, MAX_tree)));	//inserisce un numero casuale compreso fra 1 e MAX_tree, senza inserimento di duplicati
 
     printf("\tALBERO albero1\n");
     treeABR_func_print(&albero1); //stampa dell'albero albero1
@@ -214,7 +214,7 @@ void treeABR_func_generate(TREE albero) {
 	}while(n_elem < 1);
 
     for(idx=0;idx<n_elem;idx++)
-        treeABR_insertKey_v2(albero, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
+        treeABR_insertKey_dup(albero, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
     printf("\n");
     treeABR_func_print(albero);
 }
@@ -228,7 +228,7 @@ void treeABR_func_insertKey(TREE albero)   {
             printf("ATTENZIONE: Valore non valido\n\n");
     }while(val < 1);
 
-    treeABR_insertKey_v2(albero, val);
+    treeABR_insertKey_dup(albero, val);
     printf("\n");
     treeABR_func_print(albero);
 }
@@ -269,6 +269,6 @@ void treeABR_func_delete(TREE albero)  {
 //Stampa dell'Albero
 void treeABR_func_print(TREE albero)  {
     treeABR_postOrder_h(albero); //aggiornamento delle altezze
-    printf("\tNumero elementi: %d\n", treeABR_inOrder(albero, 0));  //stampa ordinata e conteggio nodi
+    printf("\tNumero elementi: %d\n", treeABR_inOrder(albero, 0, 1));  //stampa ordinata dei nodi (attivando il terzo parametro con '1') e conteggio nodi
     printf("\tAltezza massima: %d\n", (*albero)->h);
 }

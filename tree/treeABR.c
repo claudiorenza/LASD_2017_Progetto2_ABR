@@ -1,26 +1,26 @@
 #include "treeABR.h"
 
-//Inserimento del nodo nell'albero, in maniera efficiente
-inthgn  kuiu treeABR_insertKey_v1(TREE albero, int key)	{
+//Inserimento del nodo nell'albero, con controllo di eventuali duplicati
+int treeABR_insertKey(TREE albero, int key)	{
 	if(*albero)	{		//se la "scatola" ha qualcosa dentro
 		if(key < (*albero)->elem)	//confronto il valore 'key' con quello presente al suo interno
-			treeABR_insertKey_v2(&(*albero)->sx, key);	//se 'key' è più piccolo, scendo a sinistra
+			return treeABR_insertKey(&(*albero)->sx, key);	//se 'key' è più piccolo, scendo a sinistra
 		else if(key > (*albero)->elem)
-			treeABR_insertKey_v2(&(*albero)->dx, key);	//altrimenti, a destra
+			return treeABR_insertKey(&(*albero)->dx, key);	//altrimenti, a destra
 		else	
-			return 0;
+			return 1;	//confermo alla funzione ricorsiva che c'è un duplicato
 	} else	//se non c'è niente dentro la "scatola"
 		*albero = treeABR_createNode(key);
-	return 1;
+	return 0;	//niente da segnalare
 }
 
-//Inserimento del nodo nell'albero con nodi uguali, in maniera efficiente
-void treeABR_insertKey_v2(TREE albero, int key)	{
+//Inserimento del nodo nell'albero con nodi uguali, con inserimento di elementi duplicati
+void treeABR_insertKey_dup(TREE albero, int key)	{
 	if(*albero)	{		//se la "scatola" ha qualcosa dentro
 		if(key < (*albero)->elem)	//confronto il valore 'key' con quello presente al suo interno
-			treeABR_insertKey_v2(&(*albero)->sx, key);	//se 'key' è più piccolo, scendo a sinistra
+			treeABR_insertKey_dup(&(*albero)->sx, key);	//se 'key' è più piccolo, scendo a sinistra
 		else if(key > (*albero)->elem)
-			treeABR_insertKey_v2(&(*albero)->dx, key);	//altrimenti, a destra
+			treeABR_insertKey_dup(&(*albero)->dx, key);	//altrimenti, a destra
 		else	{	//se sono uguali
 			//printf("DEBUG: valori uguali\n");
 			if(!((*albero)->sx))	//se trovo un sottoalbero vuoto a sinistra, inserisco lì il valore duplicato
@@ -28,7 +28,7 @@ void treeABR_insertKey_v2(TREE albero, int key)	{
 			else if(!((*albero)->dx))	//altrimenti a destra
 				(*albero)->dx = treeABR_createNode(key);
 			else	//continuo la visita all'interno del sottoalbero sinistro
-				treeABR_insertKey_v2(&(*albero)->sx, key);
+				treeABR_insertKey_dup(&(*albero)->sx, key);
 		}
 	} else	//se non c'è niente dentro la "scatola"
 		*albero = treeABR_createNode(key);
@@ -114,17 +114,15 @@ void treeABR_average(int n_trees, int n_nodes_A, int n_nodes_B)	{
 	int idx_trees, idx_nodes, h_sum = 0, n_nodes, n_nodes_sum = 0;
 	TREEel albero = NULL;
 	for(idx_trees=0;idx_trees<n_trees;idx_trees++)	{	//ciclo per il numero di alberi
-		if(n_nodes_B)		//se ho stabilito un margine massimo del numero di nodi
+		if(n_nodes_B)		//se ho stabilito un margine minimo e massimo del numero di nodi
 			n_nodes_sum = n_nodes_sum + (n_nodes = random_num(n_nodes_A, n_nodes_B));	//genero un valore casuale di nodi compreso tra A e B
 		else
 			n_nodes = n_nodes_A;
 		for(idx_nodes=0;idx_nodes<n_nodes;idx_nodes++)	//inserisco n_nodes_A nodi
-			treeABR_insertKey_v2(&albero, random_num(1, n_nodes_A));	//inserisce un valore casuale compreso fra 1 e n_nodes_A
-		//IMPORTANTE: è possibile calcolare l'altezza massima ogni volta che si inserice un nuovo nodo nell'albero,
-		//risparmiando una nuova visita di tutti i nodi (O(n))
-		treeABR_postOrder_h(&albero);
-		h_sum = h_sum + albero->h;
-		treeABR_delete(&albero);
+			while(treeABR_insertKey(&albero, random_num(1, INT_MAX)));	//inserisce un valore casuale compreso fra 1 e INT_MAX, senza duplicati
+		treeABR_postOrder_h(&albero);	//inserisco le altezze nell'albero
+		h_sum = h_sum + albero->h;	//somma delle altezze degli alberi
+		treeABR_delete(&albero);	//cancello l'albero per crearne uno nuovo
 	}
 	printf("\n\n");
 	if(n_nodes_B)
@@ -132,38 +130,82 @@ void treeABR_average(int n_trees, int n_nodes_A, int n_nodes_B)	{
 	printf("Altezza media degli alberi: %.3f\n\n", (float)h_sum / (float)n_trees);
 }
 
-//Unione di due alberi
+//Unione di due alberi in maniera efficiente
 void treeABR_merge(TREE albero1, TREE albero2)	{
-	if(*albero2)	{
-		treeABR_merge(albero1, &(*albero2)->sx);
-		treeABR_merge(albero1, &(*albero2)->dx);	//scorro in postOrder l'albero per visitare le foglie e mai i nodi interni per trasferire i nodi e non sottoalberi
+	TREE *albero1_arr = treeABR_merge_toArray(albero1);
+	treeABR_merge_visit(albero1_arr, albero2, 0);
+}
 
-		(*albero2)->sx = NULL;	//tolgo i vecchi riferimenti ai figli
-		(*albero2)->dx = NULL;
-		treeABR_insertKey_merge(albero1, *albero2);	//inserisce il nodo partendo dalla radice di albero1
+//Creazione array di appoggio ordinato con riferimenti ai nodi
+TREE *treeABR_merge_toArray(TREE albero)	{
+	TREE *albero_arr = (TREE *)calloc(treeABR_inOrder(albero, 0, 0), sizeof(TREE)); //allocazione array di puntatori ai nodi con conteggio (senza stampa, terzo parametro '0')
+	treeABR_merge_toArray_print(albero_arr, treeABR_merge_toArray_create(albero_arr, albero, 0));	//riempimento e stampa dell'array
+	return albero_arr;
+}
+
+//Assegnazione ricorsiva inOrder nell'array dei puntatori ai nodi, con restituzione del numero di nodi
+int treeABR_merge_toArray_create(TREE *albero_arr, TREE albero, int idx)	{
+	if(*albero)	{
+		idx = treeABR_merge_toArray_create(albero_arr, &(*albero)->sx, idx);
+		albero_arr[idx] = albero;	//inserisco il riferimento al nodo attuale in posizione idx
+		return treeABR_merge_toArray_create(albero_arr, &(*albero)->dx, idx+1);
 	}
+	return idx;
 }
 
+void treeABR_merge_toArray_print(TREE *albero_arr, int n_elem)	{
+	int idx;
+	for(idx=0;idx<n_elem;idx++)
+		printf("[%d] %d\n", idx, (*albero_arr[idx])->elem);
+}
 
-//Inserimento del nodo nell'albero per il merge, senza nuova allocazione
-void treeABR_insertKey_merge(TREE albero, TREEel node)	{
-	if(*albero)	{		//se la "scatola" ha qualcosa dentro
-		if(node->elem < (*albero)->elem)	//confronto il valore 'node' con quello presente al suo interno
-			treeABR_insertKey_merge(&(*albero)->sx, node);	//se 'node' è più piccolo, scendo a sinistra
-		else if(node->elem > (*albero)->elem)
-			treeABR_insertKey_merge(&(*albero)->dx, node);	//altrimenti, a destra
-		else	{	//se sono uguali
-			if(!((*albero)->sx))	//se trovo un sottoalbero vuoto a sinistra, inserisco lì il valore duplicato
-				(*albero)->sx = node;
-			else if(!((*albero)->dx))	//altrimenti a destra
-				(*albero)->dx = node;
-			else	//continuo la visita all'interno del sottoalbero sinistro
-				treeABR_insertKey_merge(&(*albero)->sx, node);
-		}
+//Visita in T2 per il merge in T1 tramite array, senza nuova allocazione, con inserimento fra intervalli di valori
+int treeABR_merge_visit(TREE *albero1_arr, TREE albero2, int idx)	{
+	if(*albero2)	{
+		idx = treeABR_merge_visit(albero1_arr, &(*albero2)->sx, idx);	//scorro T2 a sinistra aspettandomi l'indice 'idx' aggiornato
+		
+		//N.B.:solo durante la visita viene aggiornato e ritornato ai R.A. precedenti l'indice di visita 'idx' in T1
+		//'idx' è l'indice del valore minimo dell'intervallo
+		//'idx+1' è l'indice del valore massimo dell'intervallo
+		while(*albero1_arr[idx+1] && (*albero1_arr[idx+1])->elem < (*albero2)->elem)	//se il valore in visita in T2 è più grande del margine superiore dell'attuale intervallo nell'array
+			idx++;	//passo al valore successivo nell'array di T1 fin quando qui dentro non trovo un valore più grande di T2 (ricavando un nuovo intervallo di valori)
+		
+		if((*albero2)->elem < (*albero1_arr[idx])->elem)	//questa condizione, se verificata, può avvenire solo all'inizio della visita in T2,
+			(*albero1_arr[idx])->sx = *albero2;				//quando e se ci sono valori di T2 più piccoli del valore minimo di T1
+		else if((*albero1_arr[idx])->elem < (*albero2)->elem && (*albero2)->elem < (*albero1_arr[idx+1])->elem)	{ //se il valore è compreso nell'intervallo
+			if(!(*albero1_arr[idx])->dx)	//se la foglia del minimo dell'intervallo non ha un sottoalbero destro
+				(*albero1_arr[idx])->dx = *albero2;	//inserisco il valore come foglia destra del minimo
+			else if(!(*albero1_arr[idx+1])->sx)	//se la foglia del massimo dell'intervallo non ha un sottoalbero sinistro
+				(*albero1_arr[idx+1])->sx = *albero2;	//inserisco il valore come foglia sinistra del massimo
+			else
+				printf("DEBUG: ERRORE inserimento foglia\n\n");
+		} else if((*albero1_arr[idx+1])->elem < (*albero2)->elem) 	//questa condizione, se verificata, può avvenire solo verso la fine della visita in T2,
+			(*albero1_arr[idx])->sx = *albero2;						//quando e se ci sono valori di T2 più grandi del valore massimo di T1
+
+		albero1_arr[idx] = albero2;	//aggiorno i riferimenti al valore del margine minimo per stabilire il nuovo intervallo con l'elemento appena inserito
+		
+		idx = treeABR_merge_visit(albero1_arr, &(*albero2)->dx, idx);	//scorro inOrder l'albero T2 con l'indice del margine minimo aggiornato
+
+		(*albero2)->sx = NULL;	//tolgo i vecchi riferimenti ai figli in T2
+		(*albero2)->dx = NULL;
+		//treeABR_merge_insertKey(albero1, *albero2);	//inserisce il nodo partendo dalla radice di albero1
+	}
+	return idx;
+}
+	
+/*	
+void treeABR_merge_insertKey(TREE albero1, TREEel node2)	{
+	if(*albero1)	{		//se la "scatola" ha qualcosa dentro
+		if(node2->elem < (*albero1)->elem)	//confronto il valore 'node2' con quello presente al suo interno
+			treeABR_merge_insertKey(&(*albero1)->sx, node2);	//se 'node2' è più piccolo, scendo a sinistra
+		else if(node2->elem > (*albero1)->elem)
+			treeABR_merge_insertKey(&(*albero1)->dx, node2);	//altrimenti, a destra
+		else		//se sono uguali
+			free(node2);
 	} else		//se non c'è niente dentro la "scatola"
-		*albero = node;
+		*albero1 = node2;
 }
-
+*/
 
 //Rotazione a sinistra
 void treeABR_rotate_SX(TREE albero)	{
@@ -182,15 +224,15 @@ void treeABR_rotate_DX(TREE albero)	{
 }
 
 
-//Visita in ordine di un albero con contatore del numero dei nodi
-int treeABR_inOrder(TREE albero, int i)	{
+//Visita in ordine di un albero con restituzione del numero dei nodi, con possibile di stampa
+int treeABR_inOrder(TREE albero, int idx, int print)	{
 	if(*albero)	{
-		i = treeABR_inOrder(&(*albero)->sx, i);
-		printf("%d [h: %d]\n", (*albero)->elem, (*albero)->h);
-		i++;
-		return treeABR_inOrder(&(*albero)->dx, i);
+		idx = treeABR_inOrder(&(*albero)->sx, idx, print);
+		if(print)
+			printf("%d [h: %d]\n", (*albero)->elem, (*albero)->h);
+		return treeABR_inOrder(&(*albero)->dx, idx+1, print);
 	}
-	return i;
+	return idx;
 }
 
 //Assegnamento delle altezze in postOrder
