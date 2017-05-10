@@ -111,26 +111,26 @@ void treeABR_func_merge()  {
 	TREEel albero1 = NULL;
     TREEel albero2 = NULL;
     int idx;
-    for(idx=0;idx<5/*random_num(10, 30)*/;idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in albero1
+    for(idx=0;idx<random_num(10, 50);idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 50 in albero1
         while(treeABR_insertKey(&albero1, random_num(1, MAX_tree)));	//inserisce un numero casuale compreso fra 1 e MAX_tree, senza inserimento di duplicati
 
-    for(idx=0;idx<5/*random_num(10, 30)*/;idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in albero2
+    for(idx=0;idx<random_num(10, 50);idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 50 in albero2
         while(treeABR_insertKey(&albero2, random_num(1, MAX_tree)));	//inserisce un numero casuale compreso fra 1 e MAX_tree, senza inserimento di duplicati
 
-    printf("\tALBERO albero1\n");
-    treeABR_func_print(&albero1); //stampa dell'albero albero1
+    printf("\tALBERO T1\n");
+    treeABR_func_print(&albero1); //stampa dell'albero1
     printf("\n\n");
-    printf("\tALBERO albero2\n");
+    printf("\tALBERO T2\n");
     treeABR_func_print(&albero2); //e albero2
     printf("\n\n");
 
     printf("Alberi pronti per il Merge\n");
     io_pressKey();  //premo invio per incominciare il Merge
-
+    printf("\n\n");    
     treeABR_merge(&albero1, &albero2);
-
-    printf("\tALBERO albero1 unito\n");
-    treeABR_func_print(&albero1); //stampa dell'albero albero1 unito
+    printf("\n");    
+    printf("\tALBERO T1 unito\n");
+    treeABR_func_print(&albero1); //stampa dell'albero1 unito
 }
 
 

@@ -36,10 +36,10 @@ void treeABR_nodeFree(TREEel albero_curr);
 void treeABR_average(int n_trees, int n_nodes_A, int n_nodes_B);
 
 void treeABR_merge(TREE albero1, TREE albero2);
-TREE *treeABR_merge_toArray(TREE albero);
-int treeABR_merge_toArray_create(TREE *albero_arr, TREE albero, int idx);
-void treeABR_merge_toArray_print(TREE *albero_arr, int n_elem);
-int treeABR_merge_visit(TREE *albero1_arr, TREE albero2, int idx);
+TREEel *treeABR_merge_toArray(TREE albero);
+int treeABR_merge_toArray_create(TREEel *albero_arr, TREE albero, int idx);
+//void treeABR_merge_toArray_print(TREEel *albero_arr, int n_elem);
+int treeABR_merge_visit(TREEel *albero1_arr, TREE albero2, int idx, int idx_limit);
 
 void treeABR_rotate_SX(TREE albero);
 void treeABR_rotate_DX(TREE albero);
