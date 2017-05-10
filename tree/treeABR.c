@@ -22,7 +22,6 @@ void treeABR_insertKey_dup(TREE albero, int key)	{
 		else if(key > (*albero)->elem)
 			treeABR_insertKey_dup(&(*albero)->dx, key);	//altrimenti, a destra
 		else	{	//se sono uguali
-			//printf("DEBUG: valori uguali\n");
 			if(!((*albero)->sx))	//se trovo un sottoalbero vuoto a sinistra, inserisco lì il valore duplicato
 				(*albero)->sx = treeABR_createNode(key);
 			else if(!((*albero)->dx))	//altrimenti a destra
@@ -155,6 +154,7 @@ int treeABR_merge_toArray_create(TREE *albero_arr, TREE albero, int idx)	{
 
 void treeABR_merge_toArray_print(TREE *albero_arr, int n_elem)	{
 	int idx;
+	printf("\tARRAY T1\n");
 	for(idx=0;idx<n_elem;idx++)
 		printf("[%d] %d\n", idx, (*albero_arr[idx])->elem);
 }
@@ -162,33 +162,73 @@ void treeABR_merge_toArray_print(TREE *albero_arr, int n_elem)	{
 //Visita in T2 per il merge in T1 tramite array, senza nuova allocazione, con inserimento fra intervalli di valori
 int treeABR_merge_visit(TREE *albero1_arr, TREE albero2, int idx)	{
 	if(*albero2)	{
+		int del = 0;
+		printf("DEBUG: visita a sinistra\n\n");
 		idx = treeABR_merge_visit(albero1_arr, &(*albero2)->sx, idx);	//scorro T2 a sinistra aspettandomi l'indice 'idx' aggiornato
 		
+		printf("DEBUG: Elemento attuale: %d\n", (*albero2)->elem);
 		//N.B.:solo durante la visita viene aggiornato e ritornato ai R.A. precedenti l'indice di visita 'idx' in T1
 		//'idx' è l'indice del valore minimo dell'intervallo
 		//'idx+1' è l'indice del valore massimo dell'intervallo
-		while(*albero1_arr[idx+1] && (*albero1_arr[idx+1])->elem < (*albero2)->elem)	//se il valore in visita in T2 è più grande del margine superiore dell'attuale intervallo nell'array
+		printf("DEBUG VISITA: intervallo attuale [%d]-[%d] = %d - %d\n", idx, idx+1, (*albero1_arr[idx])->elem, (*albero1_arr[idx+1])->elem);
+		while(albero1_arr[idx+1] && (*albero1_arr[idx+1])->elem < (*albero2)->elem)	{	//se il valore in visita in T2 è più grande del margine superiore dell'attuale intervallo nell'array
 			idx++;	//passo al valore successivo nell'array di T1 fin quando qui dentro non trovo un valore più grande di T2 (ricavando un nuovo intervallo di valori)
+			printf("DEBUG i: %d\n", idx);
+		}
+		printf("DEBUG: indici nuovi[%d]-[%d] = ", idx, idx+1);
+		printf("%d - %d\n\n", (*albero1_arr[idx])->elem, (*albero1_arr[idx+1])->elem);
 		
-		if((*albero2)->elem < (*albero1_arr[idx])->elem)	//questa condizione, se verificata, può avvenire solo all'inizio della visita in T2,
-			(*albero1_arr[idx])->sx = *albero2;				//quando e se ci sono valori di T2 più piccoli del valore minimo di T1
-		else if((*albero1_arr[idx])->elem < (*albero2)->elem && (*albero2)->elem < (*albero1_arr[idx+1])->elem)	{ //se il valore è compreso nell'intervallo
-			if(!(*albero1_arr[idx])->dx)	//se la foglia del minimo dell'intervallo non ha un sottoalbero destro
-				(*albero1_arr[idx])->dx = *albero2;	//inserisco il valore come foglia destra del minimo
-			else if(!(*albero1_arr[idx+1])->sx)	//se la foglia del massimo dell'intervallo non ha un sottoalbero sinistro
-				(*albero1_arr[idx+1])->sx = *albero2;	//inserisco il valore come foglia sinistra del massimo
-			else
-				printf("DEBUG: ERRORE inserimento foglia\n\n");
-		} else if((*albero1_arr[idx+1])->elem < (*albero2)->elem) 	//questa condizione, se verificata, può avvenire solo verso la fine della visita in T2,
-			(*albero1_arr[idx])->sx = *albero2;						//quando e se ci sono valori di T2 più grandi del valore massimo di T1
+		if(!(*albero1_arr[idx+1]))
+			printf("\tDEBUG: raggiunto indice massimo\n\n");
 
-		albero1_arr[idx] = albero2;	//aggiorno i riferimenti al valore del margine minimo per stabilire il nuovo intervallo con l'elemento appena inserito
-		
-		idx = treeABR_merge_visit(albero1_arr, &(*albero2)->dx, idx);	//scorro inOrder l'albero T2 con l'indice del margine minimo aggiornato
-
-		(*albero2)->sx = NULL;	//tolgo i vecchi riferimenti ai figli in T2
+		printf("DEBUG: salvataggio sottoalbero destro\n");
+		TREEel albero2_destra = (*albero2)->dx; //mi salvo temporaneamente il nodo per accedere al sottoalbero destro per continuare la visita in T2
+		printf("\tDEBUG: SALVATO\n");
+		if(!albero2_destra)
+			printf("DEBUG: Prima ELEMENTO A DESTRA NON PRESENTE\n");
+		(*albero2)->sx = NULL;	//tolgo i vecchi riferimenti ai figli in T2 ai fini dell'inserimento in T1
 		(*albero2)->dx = NULL;
-		//treeABR_merge_insertKey(albero1, *albero2);	//inserisce il nodo partendo dalla radice di albero1
+		if(!albero2_destra)
+			printf("DEBUG: Dopo ELEMENTO A DESTRA NON PRESENTE\n");
+		printf("DEBUG: riferimenti annullati\n");
+		printf("DEBUG: prepare to merge %d in %d-%d\n", (*albero2)->elem, (*albero1_arr[idx])->elem, (*albero1_arr[idx+1])->elem);
+		if((*albero2)->elem < (*albero1_arr[idx])->elem)	{	//questa condizione, se verificata, può avvenire solo all'inizio della visita in T2,
+			printf("DEBUG: valore più piccolo dell'intervallo\n");
+			(*albero1_arr[idx])->sx = *albero2;				//quando e se ci sono valori di T2 più piccoli del valore minimo di T1
+		}else if((*albero1_arr[idx])->elem < (*albero2)->elem && (*albero2)->elem < (*albero1_arr[idx+1])->elem)	{ //se il valore è compreso nell'intervallo
+			printf("DEBUG: valore compreso nell'intervallo\n");
+			if(!(*albero1_arr[idx])->dx)	{	//se la foglia del minimo dell'intervallo non ha un sottoalbero destro
+				printf("\tDEBUG: salvato al margine minimo a destra\n");
+				(*albero1_arr[idx])->dx = *albero2;	//inserisco il valore come foglia destra del minimo
+			} else if(!(*albero1_arr[idx+1])->sx)	{//se la foglia del massimo dell'intervallo non ha un sottoalbero sinistro
+				printf("\tDEBUG: salvato al margine massimo a sinistra\n");				
+				(*albero1_arr[idx+1])->sx = *albero2;	//inserisco il valore come foglia sinistra del massimo
+			} else	{
+				printf("\tDEBUG: ERRORE inserimento foglia\n");
+				if(albero1_arr[idx])
+					printf("\t\tsu margine minore: %d", (*albero1_arr[idx])->dx->elem);
+				if(albero1_arr[idx+1])
+					printf("\t\tsu margine superiore: %d", (*albero1_arr[idx+1])->sx->elem);
+			}
+		} else if((*albero1_arr[idx+1])->elem < (*albero2)->elem)	{ 	//questa condizione, se verificata, può avvenire solo verso la fine della visita in T2,
+			printf("DEBUG: valore più grande dell'intervallo\n");		
+			(*albero1_arr[idx])->sx = *albero2;						//quando e se ci sono valori di T2 più grandi del valore massimo di T1
+		}else if((*albero1_arr[idx])->elem == (*albero2)->elem || (*albero1_arr[idx+1])->elem == (*albero2)->elem)	{
+			printf("DEBUG: DUPLICATO\n");
+			del = 1;
+		}
+
+		if(!del)	//se il nuovo nodo non è un duplicato in T1
+			albero1_arr[idx] = albero2;	//aggiorno i riferimenti al valore del margine minimo per stabilire il nuovo intervallo con l'elemento appena inserito
+		printf("DEBUG: visita a destra\n\n");
+		idx = treeABR_merge_visit(albero1_arr, &albero2_destra, idx);	//scorro inOrder l'albero T2 con l'indice del margine minimo aggiornato
+		printf("DEBUG: fine visita %d\n\n", (*albero2)->elem);
+		
+
+		if(del)	{//se il nodo è un duplicato
+			free(*albero2); 	//lo dealloco
+			printf("DEBUG: deallocato duplicato\n");			
+		}//treeABR_merge_insertKey(albero1, *albero2);	//inserisce il nodo partendo dalla radice di albero1
 	}
 	return idx;
 }

@@ -111,10 +111,10 @@ void treeABR_func_merge()  {
 	TREEel albero1 = NULL;
     TREEel albero2 = NULL;
     int idx;
-    for(idx=0;idx<random_num(10, 30);idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in albero1
+    for(idx=0;idx<5/*random_num(10, 30)*/;idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in albero1
         while(treeABR_insertKey(&albero1, random_num(1, MAX_tree)));	//inserisce un numero casuale compreso fra 1 e MAX_tree, senza inserimento di duplicati
 
-    for(idx=0;idx<random_num(10, 30);idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in albero2
+    for(idx=0;idx<5/*random_num(10, 30)*/;idx++) //si inseriscono un numero di nodi casuale compreso tra 10 e 30 in albero2
         while(treeABR_insertKey(&albero2, random_num(1, MAX_tree)));	//inserisce un numero casuale compreso fra 1 e MAX_tree, senza inserimento di duplicati
 
     printf("\tALBERO albero1\n");
