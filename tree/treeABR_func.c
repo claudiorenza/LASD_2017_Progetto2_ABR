@@ -174,8 +174,12 @@ void treeABR_func_rotate(TREE albero)  {
                 printf("ATTENZIONE: Limite albero raggiunto\n\n");
                 break;
             }
-            printf("\tNuova Radice: %d\n\n", (*albero)->elem);
+            printf("\n");
+            printf("\tAggiornamento Radice: %d\n\n", (*albero)->elem);
         }
+        printf("\tALBERO RUOTATO\n");
+        treeABR_func_print(albero); //stampa albero ruotato
+        printf("\tRadice: %d\n\n", (*albero)->elem);
     }
 }
 

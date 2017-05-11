@@ -210,6 +210,8 @@ void treeABR_rotate_SX(TREE albero)	{
 	TREEel new_root = (*albero)->dx;
 	(*albero)->dx = new_root->sx;
 	new_root->sx = *albero;
+	new_root->h = treeABR_h_max(&new_root) + 1;
+	(*albero)->h = treeABR_h_max(albero) + 1;
 	*albero = new_root;
 }
 
@@ -218,6 +220,8 @@ void treeABR_rotate_DX(TREE albero)	{
 	TREEel new_root = (*albero)->sx;
 	(*albero)->sx = new_root->dx;
 	new_root->dx = *albero;
+	new_root->h = treeABR_h_max(&new_root) + 1;
+	(*albero)->h = treeABR_h_max(albero) + 1;
 	*albero = new_root;
 }
 
