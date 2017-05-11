@@ -151,7 +151,7 @@ int treeABR_merge_toArray_create(TREEel *albero_arr, TREE albero, int idx)	{
 	return idx;
 }
 
-/*
+/* Mettiamo a disposizione l'algoritmo per la stampa dell'array
 void treeABR_merge_toArray_print(TREEel *albero_arr, int n_elem)	{
 	int idx;
 	printf("\tARRAY T1\n");
@@ -205,8 +205,8 @@ int treeABR_merge_visit(TREEel *albero1_arr, TREE albero2, int idx, int idx_limi
 	return idx;
 }
 
-//Rotazione a sinistra
-void treeABR_rotate_SX(TREE albero)	{
+//Rotazione singola a sinistra
+void treeABR_rotate_single_SX(TREE albero)	{
 	TREEel new_root = (*albero)->dx;
 	(*albero)->dx = new_root->sx;
 	new_root->sx = *albero;
@@ -215,14 +215,73 @@ void treeABR_rotate_SX(TREE albero)	{
 	*albero = new_root;
 }
 
-//Rotazione a destra
-void treeABR_rotate_DX(TREE albero)	{
+//Rotazione singola a destra
+void treeABR_rotate_single_DX(TREE albero)	{
 	TREEel new_root = (*albero)->sx;
 	(*albero)->sx = new_root->dx;
 	new_root->dx = *albero;
 	new_root->h = treeABR_h_max(&new_root) + 1;
 	(*albero)->h = treeABR_h_max(albero) + 1;
 	*albero = new_root;
+}
+
+//Rotazione doppia a sinistra
+void treeABR_rotate_double_SX(TREE albero)	{
+	treeABR_rotate_single_DX(&(*albero)->sx);
+	treeABR_rotate_single_SX(albero);
+}
+
+//Rotazione doppia a destra
+void treeABR_rotate_double_DX(TREE albero)	{
+	treeABR_rotate_single_SX(&(*albero)->dx);
+	treeABR_rotate_single_DX(albero);
+}
+
+
+void treeABR_balance(TREE albero)	{
+	if(*albero)	{
+		printf("DEBUG: visita a sinistra\n");
+		treeABR_balance(&(*albero)->sx);
+		printf("DEBUG: bilanciamento per rotazione a sinistra\n");
+		treeABR_balance_SX(albero);
+		printf("DEBUG: visita a destra\n");
+		treeABR_balance(&(*albero)->dx);
+		printf("DEBUG: bilanciamento per rotazione a destra\n");		
+		treeABR_balance_DX(albero);
+	}
+
+}
+
+void treeABR_balance_SX(TREE albero)	{
+	if(treeABR_h((*albero)->dx) - treeABR_h((*albero)->sx) == 2)	{
+		printf("\tDEBUG ROTAZIONE SX: APPLICABILE sx: %d - dx: %d\n", treeABR_h((*albero)->sx), treeABR_h((*albero)->dx));		
+		if(treeABR_h((*albero)->dx) > treeABR_h((*albero)->sx))	{
+			printf("\tDEBUG ROTAZIONE SX: singola rotazione\n");					
+			treeABR_rotate_single_SX(albero);
+		} else	{
+			printf("\tDEBUG ROTAZIONE SX: doppia rotazione\n");								
+			treeABR_rotate_double_SX(albero);
+		}
+	} else	
+		(*albero)->h = treeABR_h_max(albero) + 1;
+	
+	printf("\tDEBUG ROTAZIONE SX: aggiornamento altezza %d [h: %d]\n", (*albero)->elem, (*albero)->h);											
+}
+
+void treeABR_balance_DX(TREE albero)	{
+	if(treeABR_h((*albero)->sx) - treeABR_h((*albero)->dx) == 2)	{
+		printf("\tDEBUG ROTAZIONE DX: APPLICABILE sx: %d - dx: %d\n", treeABR_h((*albero)->sx), treeABR_h((*albero)->dx));				
+		if(treeABR_h((*albero)->sx) > treeABR_h((*albero)->dx))	{
+			printf("\tDEBUG ROTAZIONE DX: singola rotazione\n");											
+			treeABR_rotate_single_DX(albero);
+		} else	{
+			printf("\tDEBUG ROTAZIONE DX: doppia rotazione\n");								
+			treeABR_rotate_double_DX(albero);
+		}
+	} else 
+		(*albero)->h = treeABR_h_max(albero) + 1;
+	
+	printf("\tDEBUG ROTAZIONE DX: aggiornamento altezza %d [h: %d]\n", (*albero)->elem, (*albero)->h);											
 }
 
 
@@ -246,11 +305,16 @@ void treeABR_postOrder_h(TREE albero)	{
 	}
 }
 
+//Ritorno dell'altezza del nodo
+int treeABR_h(TREEel albero)	{
+	if(albero)
+		return albero->h;
+	return -1;
+}
+
+//Ritorno del sottoalbero più alto
 int treeABR_h_max(TREE albero)	{
-	if(((*albero)->sx && !(*albero)->dx) || (((*albero)->sx && (*albero)->dx) && ((*albero)->sx->h > (*albero)->dx->h)))
-		return (*albero)->sx->h;
-	else if((!(*albero)->sx && (*albero)->dx) || (((*albero)->sx && (*albero)->dx) && ((*albero)->sx->h <= (*albero)->dx->h)))
-		return (*albero)->dx->h;
-	else
-		return -1;
+	if(treeABR_h((*albero)->sx) > treeABR_h((*albero)->dx))	
+		return treeABR_h((*albero)->sx);
+	return treeABR_h((*albero)->dx); /*else if(treeABR_h((*albero)->sx) <= treeABR_h((*albero)->dx))*/
 }

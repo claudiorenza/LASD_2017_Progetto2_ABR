@@ -118,9 +118,11 @@ void treeABR_func_merge()  {
         while(treeABR_insertKey(&albero2, random_num(1, MAX_tree)));	//inserisce un numero casuale compreso fra 1 e MAX_tree, senza inserimento di duplicati
 
     printf("\tALBERO T1\n");
+    treeABR_postOrder_h(&albero1); //aggiornamento delle altezze in albero1
     treeABR_func_print(&albero1); //stampa dell'albero1
     printf("\n\n");
     printf("\tALBERO T2\n");
+    treeABR_postOrder_h(&albero2); //aggiornamento delle altezze in albero2
     treeABR_func_print(&albero2); //e albero2
     printf("\n\n");
 
@@ -130,6 +132,7 @@ void treeABR_func_merge()  {
     treeABR_merge(&albero1, &albero2);
     printf("\n");    
     printf("\tALBERO T1 unito\n");
+    treeABR_postOrder_h(&albero1); //aggiornamento delle altezze in albero1 unito
     treeABR_func_print(&albero1); //stampa dell'albero1 unito
 }
 
@@ -138,7 +141,7 @@ void treeABR_func_merge()  {
 void treeABR_func_rotate(TREE albero)  {
     int choice;
     int n_rot;
-    treeABR_func_print(albero); //stampa dell'albero
+    treeABR_func_print(albero); //stampa dell'albero (altezze immutate)
     printf("\tRadice: %d\n\n", (*albero)->elem);
     printf("In quale direzione vuoi ruotare l'albero?\n\t1. Sinistra\t2. Destra\n\n");
     do  {
@@ -167,9 +170,9 @@ void treeABR_func_rotate(TREE albero)  {
         int idx_rot;
         for(idx_rot=0;idx_rot<n_rot;idx_rot++)  {
             if(choice == 1 && (*albero)->dx) 
-                treeABR_rotate_SX(albero);
+                treeABR_rotate_single_SX(albero);
             else if(choice == 2 && (*albero)->sx)  
-                treeABR_rotate_DX(albero);
+                treeABR_rotate_single_DX(albero);
             else    {
                 printf("ATTENZIONE: Limite albero raggiunto\n\n");
                 break;
@@ -178,18 +181,21 @@ void treeABR_func_rotate(TREE albero)  {
             printf("\tAggiornamento Radice: %d\n\n", (*albero)->elem);
         }
         printf("\tALBERO RUOTATO\n");
-        treeABR_func_print(albero); //stampa albero ruotato
+        treeABR_func_print(albero); //stampa albero ruotato (non necessita di aggiornamento delle altezze)
         printf("\tRadice: %d\n\n", (*albero)->elem);
     }
 }
 
 //Bilanciamento dell'Albero
 void treeABR_func_balance(TREE albero)  {
-    treeABR_func_print(albero); //stampa dell'albero
+    treeABR_func_print(albero); //stampa dell'albero (altezze immutate)
     printf("Albero pronto per il bilanciamento\n");
     io_pressKey();  //premo invio per incominciare il Merge
 
-    //treeABR_balance(albero);
+    treeABR_balance(albero);
+    printf("\n");
+    printf("ALBERO BILANCIATO\n");
+    treeABR_func_print(albero);
 }
 
 //Generazione di un'Albero con valori randomici
@@ -220,6 +226,7 @@ void treeABR_func_generate(TREE albero) {
     for(idx=0;idx<n_elem;idx++)
         treeABR_insertKey_dup(albero, random_num(1, MAX_tree));	//inserisce un numero casuale compreso fra 1 e MAX_tree
     printf("\n");
+    treeABR_postOrder_h(albero); //aggiornamento delle altezze dell'albero appena creato
     treeABR_func_print(albero);
 }
 
@@ -234,12 +241,13 @@ void treeABR_func_insertKey(TREE albero)   {
 
     treeABR_insertKey_dup(albero, val);
     printf("\n");
+    treeABR_postOrder_h(albero); //aggiornamento delle altezze dell'albero aggiornato
     treeABR_func_print(albero);
 }
 
 //Estrazione con conferma dell'elemento dell'Albero
 void treeABR_func_deleteKey(TREE albero) {
-    treeABR_func_print(albero);
+    treeABR_func_print(albero); //stampa dell'albero (altezze immutate)
     int val;
     do  {
         printf("Quale valore vuoi eliminare dall'Albero?: ");
@@ -249,6 +257,7 @@ void treeABR_func_deleteKey(TREE albero) {
 
     treeABR_deleteKey(albero, val);
     printf("\n");
+    treeABR_postOrder_h(albero); //aggiornamento delle altezze dell'albero aggiornato
     treeABR_func_print(albero);
 }
 
@@ -272,7 +281,6 @@ void treeABR_func_delete(TREE albero)  {
 
 //Stampa dell'Albero
 void treeABR_func_print(TREE albero)  {
-    treeABR_postOrder_h(albero); //aggiornamento delle altezze
     printf("\tNumero elementi: %d\n", treeABR_inOrder(albero, 0, 1));  //stampa ordinata dei nodi (attivando il terzo parametro con '1') e conteggio nodi
-    printf("\tAltezza massima: %d\n", (*albero)->h);
+    printf("\tAltezza massima: %d\n", (*albero)->h);    //valore situato nella radice dell'albero
 }

@@ -41,12 +41,17 @@ int treeABR_merge_toArray_create(TREEel *albero_arr, TREE albero, int idx);
 //void treeABR_merge_toArray_print(TREEel *albero_arr, int n_elem);
 int treeABR_merge_visit(TREEel *albero1_arr, TREE albero2, int idx, int idx_limit);
 
-void treeABR_rotate_SX(TREE albero);
-void treeABR_rotate_DX(TREE albero);
+void treeABR_rotate_single_SX(TREE albero);
+void treeABR_rotate_single_DX(TREE albero);
+
+void treeABR_balance(TREE albero);
+void treeABR_balance_SX(TREE albero);
+void treeABR_balance_DX(TREE albero);
 
 int treeABR_inOrder(TREE albero, int i, int print);
 
 void treeABR_postOrder_h(TREE albero);
+int treeABR_h(TREEel albero);
 int treeABR_h_max(TREE albero);
 
 #endif
