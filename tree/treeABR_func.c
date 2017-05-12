@@ -188,14 +188,16 @@ void treeABR_func_rotate(TREE albero)  {
 
 //Bilanciamento dell'Albero
 void treeABR_func_balance(TREE albero)  {
-    treeABR_func_print(albero); //stampa dell'albero (altezze immutate)
+    //treeABR_func_print(albero); //stampa dell'albero (altezze immutate)
+/*DEBUG*/treeABR_preOrder(albero);
     printf("Albero pronto per il bilanciamento\n");
     io_pressKey();  //premo invio per incominciare il Merge
 
     treeABR_balance(albero);
     printf("\n");
     printf("ALBERO BILANCIATO\n");
-    treeABR_func_print(albero);
+/*DEBUG*/treeABR_preOrder(albero);
+    //treeABR_func_print(albero);
 }
 
 //Generazione di un'Albero con valori randomici

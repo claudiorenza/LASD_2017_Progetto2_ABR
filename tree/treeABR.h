@@ -45,11 +45,10 @@ void treeABR_rotate_single_SX(TREE albero);
 void treeABR_rotate_single_DX(TREE albero);
 
 void treeABR_balance(TREE albero);
-void treeABR_balance_SX(TREE albero);
-void treeABR_balance_DX(TREE albero);
+void treeABR_balance_visit(TREE albero);
 
 int treeABR_inOrder(TREE albero, int i, int print);
-
+void treeABR_preOrder(TREE albero);
 void treeABR_postOrder_h(TREE albero);
 int treeABR_h(TREEel albero);
 int treeABR_h_max(TREE albero);

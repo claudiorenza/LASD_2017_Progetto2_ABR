@@ -210,8 +210,10 @@ void treeABR_rotate_single_SX(TREE albero)	{
 	TREEel new_root = (*albero)->dx;
 	(*albero)->dx = new_root->sx;
 	new_root->sx = *albero;
-	new_root->h = treeABR_h_max(&new_root) + 1;
 	(*albero)->h = treeABR_h_max(albero) + 1;
+	printf("\tDEBUG ROTAZIONE SX: aggiornamento altezza root->dx %d [h: %d]\n", (*albero)->elem, (*albero)->h);												
+	new_root->h = treeABR_h_max(&new_root) + 1;
+	printf("\tDEBUG ROTAZIONE SX: aggiornamento altezza root %d [h: %d]\n", new_root->elem, new_root->h);													
 	*albero = new_root;
 }
 
@@ -221,7 +223,9 @@ void treeABR_rotate_single_DX(TREE albero)	{
 	(*albero)->sx = new_root->dx;
 	new_root->dx = *albero;
 	new_root->h = treeABR_h_max(&new_root) + 1;
+	printf("\tDEBUG ROTAZIONE DX: aggiornamento altezza root %d [h: %d]\n", new_root->elem, new_root->h);														
 	(*albero)->h = treeABR_h_max(albero) + 1;
+	printf("\tDEBUG ROTAZIONE DX: aggiornamento altezza root->sx %d [h: %d]\n", (*albero)->elem, (*albero)->h);													
 	*albero = new_root;
 }
 
@@ -240,35 +244,19 @@ void treeABR_rotate_double_DX(TREE albero)	{
 
 void treeABR_balance(TREE albero)	{
 	if(*albero)	{
-		printf("DEBUG: visita a sinistra\n");
+		printf("DEBUG: %d [%d]\n", (*albero)->elem, (*albero)->h);				
+		printf("DEBUG: entro a sinistra\n");		
 		treeABR_balance(&(*albero)->sx);
-		printf("DEBUG: bilanciamento per rotazione a sinistra\n");
-		treeABR_balance_SX(albero);
-		printf("DEBUG: visita a destra\n");
+		printf("DEBUG: entro a destra\n");		
 		treeABR_balance(&(*albero)->dx);
-		printf("DEBUG: bilanciamento per rotazione a destra\n");		
-		treeABR_balance_DX(albero);
+		printf("DEBUG: visita %d [%d]\n", (*albero)->elem, (*albero)->h);				
+		treeABR_balance_visit(albero);
+		printf("DEBUG: risalgo\n");
 	}
 
 }
 
-void treeABR_balance_SX(TREE albero)	{
-	if(treeABR_h((*albero)->dx) - treeABR_h((*albero)->sx) == 2)	{
-		printf("\tDEBUG ROTAZIONE SX: APPLICABILE sx: %d - dx: %d\n", treeABR_h((*albero)->sx), treeABR_h((*albero)->dx));		
-		if(treeABR_h((*albero)->dx) > treeABR_h((*albero)->sx))	{
-			printf("\tDEBUG ROTAZIONE SX: singola rotazione\n");					
-			treeABR_rotate_single_SX(albero);
-		} else	{
-			printf("\tDEBUG ROTAZIONE SX: doppia rotazione\n");								
-			treeABR_rotate_double_SX(albero);
-		}
-	} else	
-		(*albero)->h = treeABR_h_max(albero) + 1;
-	
-	printf("\tDEBUG ROTAZIONE SX: aggiornamento altezza %d [h: %d]\n", (*albero)->elem, (*albero)->h);											
-}
-
-void treeABR_balance_DX(TREE albero)	{
+void treeABR_balance_visit(TREE albero)	{
 	if(treeABR_h((*albero)->sx) - treeABR_h((*albero)->dx) == 2)	{
 		printf("\tDEBUG ROTAZIONE DX: APPLICABILE sx: %d - dx: %d\n", treeABR_h((*albero)->sx), treeABR_h((*albero)->dx));				
 		if(treeABR_h((*albero)->sx) > treeABR_h((*albero)->dx))	{
@@ -278,10 +266,19 @@ void treeABR_balance_DX(TREE albero)	{
 			printf("\tDEBUG ROTAZIONE DX: doppia rotazione\n");								
 			treeABR_rotate_double_DX(albero);
 		}
-	} else 
-		(*albero)->h = treeABR_h_max(albero) + 1;
-	
-	printf("\tDEBUG ROTAZIONE DX: aggiornamento altezza %d [h: %d]\n", (*albero)->elem, (*albero)->h);											
+	} else if(treeABR_h((*albero)->dx) - treeABR_h((*albero)->sx) == 2)	{
+		printf("\tDEBUG ROTAZIONE SX: APPLICABILE sx: %d - dx: %d\n", treeABR_h((*albero)->sx), treeABR_h((*albero)->dx));		
+		if(treeABR_h((*albero)->dx) > treeABR_h((*albero)->sx))	{
+			printf("\tDEBUG ROTAZIONE SX: singola rotazione\n");					
+			treeABR_rotate_single_SX(albero);
+		} else	{
+			printf("\tDEBUG ROTAZIONE SX: doppia rotazione\n");								
+			treeABR_rotate_double_SX(albero);
+		}
+	} else	{
+		(*albero)->h = treeABR_h_max(albero) + 1;	
+		printf("\tDEBUG ROTAZIONE: aggiornamento altezza %d [h: %d]\n", (*albero)->elem, (*albero)->h);															
+	}									
 }
 
 
@@ -294,6 +291,15 @@ int treeABR_inOrder(TREE albero, int idx, int print)	{
 		return treeABR_inOrder(&(*albero)->dx, idx+1, print);
 	}
 	return idx;
+}
+
+//Assegnamento delle altezze in postOrder
+void treeABR_preOrder(TREE albero)	{
+	if(*albero)	{
+		printf("%d [h: %d]\n", (*albero)->elem, (*albero)->h);
+		treeABR_preOrder(&(*albero)->sx);
+		treeABR_preOrder(&(*albero)->dx);
+	}
 }
 
 //Assegnamento delle altezze in postOrder
