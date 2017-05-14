@@ -169,11 +169,12 @@ void treeABR_func_rotate(TREE albero)  {
         }while(n_rot < 1);
         int idx_rot;
         for(idx_rot=0;idx_rot<n_rot;idx_rot++)  {
-            if(choice == 1 && (*albero)->dx) 
-                treeABR_rotate_single_SX(albero);
-            else if(choice == 2 && (*albero)->sx)  
-                treeABR_rotate_single_DX(albero);
-            else    {
+            if((*albero)->sx || (*albero)->dx)  {
+                if(choice == 1 && (*albero)->dx) 
+                    treeABR_rotate_single_SX(albero);
+                else if(choice == 2 && (*albero)->sx)  
+                    treeABR_rotate_single_DX(albero);
+            } else    {
                 printf("ATTENZIONE: Limite albero raggiunto\n\n");
                 break;
             }
@@ -190,6 +191,8 @@ void treeABR_func_rotate(TREE albero)  {
 void treeABR_func_balance(TREE albero)  {
     //treeABR_func_print(albero); //stampa dell'albero (altezze immutate)
 /*DEBUG*/treeABR_preOrder(albero);
+/*DEBUG*/printf("\tAltezza massima: %d\n", (*albero)->h);    //valore situato nella radice dell'albero
+
     printf("Albero pronto per il bilanciamento\n");
     io_pressKey();  //premo invio per incominciare il Merge
 
@@ -197,6 +200,8 @@ void treeABR_func_balance(TREE albero)  {
     printf("\n");
     printf("ALBERO BILANCIATO\n");
 /*DEBUG*/treeABR_preOrder(albero);
+/*DEBUG*/printf("\tAltezza massima: %d\n", (*albero)->h);    //valore situato nella radice dell'albero
+
     //treeABR_func_print(albero);
 }
 

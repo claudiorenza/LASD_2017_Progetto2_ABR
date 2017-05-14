@@ -8,7 +8,7 @@
 #include "../io/io.h"
 #include "../io/random.h"
 
-#define MAX_tree 256
+#define MAX_tree 1024
 
 struct Albero   {
     int elem;

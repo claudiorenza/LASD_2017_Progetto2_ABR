@@ -211,7 +211,7 @@ void treeABR_rotate_single_SX(TREE albero)	{
 	(*albero)->dx = new_root->sx;
 	new_root->sx = *albero;
 	(*albero)->h = treeABR_h_max(albero) + 1;
-	printf("\tDEBUG ROTAZIONE SX: aggiornamento altezza root->dx %d [h: %d]\n", (*albero)->elem, (*albero)->h);												
+	printf("\tDEBUG ROTAZIONE SX: aggiornamento altezza root->sx %d [h: %d]\n", (*albero)->elem, (*albero)->h);												
 	new_root->h = treeABR_h_max(&new_root) + 1;
 	printf("\tDEBUG ROTAZIONE SX: aggiornamento altezza root %d [h: %d]\n", new_root->elem, new_root->h);													
 	*albero = new_root;
@@ -222,22 +222,24 @@ void treeABR_rotate_single_DX(TREE albero)	{
 	TREEel new_root = (*albero)->sx;
 	(*albero)->sx = new_root->dx;
 	new_root->dx = *albero;
+	(*albero)->h = treeABR_h_max(albero) + 1;
+	printf("\tDEBUG ROTAZIONE DX: aggiornamento altezza root->dx %d [h: %d]\n", (*albero)->elem, (*albero)->h);													
+	
 	new_root->h = treeABR_h_max(&new_root) + 1;
 	printf("\tDEBUG ROTAZIONE DX: aggiornamento altezza root %d [h: %d]\n", new_root->elem, new_root->h);														
-	(*albero)->h = treeABR_h_max(albero) + 1;
-	printf("\tDEBUG ROTAZIONE DX: aggiornamento altezza root->sx %d [h: %d]\n", (*albero)->elem, (*albero)->h);													
+	
 	*albero = new_root;
 }
 
 //Rotazione doppia a sinistra
 void treeABR_rotate_double_SX(TREE albero)	{
-	treeABR_rotate_single_DX(&(*albero)->sx);
+	treeABR_rotate_single_DX(&(*albero)->dx);
 	treeABR_rotate_single_SX(albero);
 }
 
 //Rotazione doppia a destra
 void treeABR_rotate_double_DX(TREE albero)	{
-	treeABR_rotate_single_SX(&(*albero)->dx);
+	treeABR_rotate_single_SX(&(*albero)->sx);
 	treeABR_rotate_single_DX(albero);
 }
 
@@ -257,28 +259,30 @@ void treeABR_balance(TREE albero)	{
 }
 
 void treeABR_balance_visit(TREE albero)	{
-	if(treeABR_h((*albero)->sx) - treeABR_h((*albero)->dx) == 2)	{
-		printf("\tDEBUG ROTAZIONE DX: APPLICABILE sx: %d - dx: %d\n", treeABR_h((*albero)->sx), treeABR_h((*albero)->dx));				
-		if(treeABR_h((*albero)->sx) > treeABR_h((*albero)->dx))	{
-			printf("\tDEBUG ROTAZIONE DX: singola rotazione\n");											
-			treeABR_rotate_single_DX(albero);
+	do	{
+		if(treeABR_h((*albero)->sx) - treeABR_h((*albero)->dx) >= 2)	{
+			printf("\tDEBUG ROTAZIONE DX: root elem: %d - DIFF: %d - sx: %d - dx: %d\n", (*albero)->elem, treeABR_h((*albero)->sx) - treeABR_h((*albero)->dx), treeABR_h((*albero)->sx), treeABR_h((*albero)->dx));				
+			if(treeABR_h((*albero)->sx->sx) > treeABR_h((*albero)->sx->dx))	{
+				printf("\tDEBUG ROTAZIONE DX: singola rotazione\n");											
+				treeABR_rotate_single_DX(albero);
+			} else	{
+				printf("\tDEBUG ROTAZIONE DX: doppia rotazione\n");								
+				treeABR_rotate_double_DX(albero);
+			}
+		} else if(treeABR_h((*albero)->dx) - treeABR_h((*albero)->sx) >= 2)	{
+			printf("\tDEBUG ROTAZIONE SX: root elem: %d - DIFF: %d - sx: %d - dx: %d\n", (*albero)->elem, treeABR_h((*albero)->dx) - treeABR_h((*albero)->sx), treeABR_h((*albero)->sx), treeABR_h((*albero)->dx));		
+			if(treeABR_h((*albero)->dx->sx) < treeABR_h((*albero)->dx->dx))	{
+				printf("\tDEBUG ROTAZIONE SX: singola rotazione\n");					
+				treeABR_rotate_single_SX(albero);
+			} else	{
+				printf("\tDEBUG ROTAZIONE SX: doppia rotazione\n");								
+				treeABR_rotate_double_SX(albero);
+			}
 		} else	{
-			printf("\tDEBUG ROTAZIONE DX: doppia rotazione\n");								
-			treeABR_rotate_double_DX(albero);
-		}
-	} else if(treeABR_h((*albero)->dx) - treeABR_h((*albero)->sx) == 2)	{
-		printf("\tDEBUG ROTAZIONE SX: APPLICABILE sx: %d - dx: %d\n", treeABR_h((*albero)->sx), treeABR_h((*albero)->dx));		
-		if(treeABR_h((*albero)->dx) > treeABR_h((*albero)->sx))	{
-			printf("\tDEBUG ROTAZIONE SX: singola rotazione\n");					
-			treeABR_rotate_single_SX(albero);
-		} else	{
-			printf("\tDEBUG ROTAZIONE SX: doppia rotazione\n");								
-			treeABR_rotate_double_SX(albero);
-		}
-	} else	{
-		(*albero)->h = treeABR_h_max(albero) + 1;	
-		printf("\tDEBUG ROTAZIONE: aggiornamento altezza %d [h: %d]\n", (*albero)->elem, (*albero)->h);															
-	}									
+			(*albero)->h = treeABR_h_max(albero) + 1;	
+			printf("\tDEBUG ROTAZIONE: aggiornamento altezza %d [h: %d]\n", (*albero)->elem, (*albero)->h);															
+		}	
+	}while(treeABR_h((*albero)->sx) - treeABR_h((*albero)->dx) >= 2 || treeABR_h((*albero)->dx) - treeABR_h((*albero)->sx) >= 2);								
 }
 
 
