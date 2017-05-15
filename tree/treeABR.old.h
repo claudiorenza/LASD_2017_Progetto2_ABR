@@ -33,7 +33,7 @@ TREEel treeABR_staccaMin(TREE albero, TREE P);
 
 void treeABR_nodeFree(TREEel albero_curr);
 
-void treeABR_average(int n_trees, int n_nodes);
+void treeABR_average(int n_trees, int n_nodes_A, int n_nodes_B);
 
 void treeABR_merge(TREE albero1, TREE albero2);
 TREEel *treeABR_merge_toArray(TREE albero);

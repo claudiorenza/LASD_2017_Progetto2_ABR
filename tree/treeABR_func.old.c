@@ -71,33 +71,39 @@ int treeABR_func_menu(TREE albero)	{
 
 //Calcolo altezza media di sequenza di Alberi
 void treeABR_func_average()  {
-	int n_trees, n_nodes = 0, choice;
-    printf("Scegli la modalità:\n\t1. Test Singolo\t\t2. Benchmark (Test con 2-4-8-16-32-...-1024 nodi)\n\n");
+	int n_trees, n_nodes_A = 0, n_nodes_B = 0, choiceMode;
     do  {
-        printf("SCELTA: ");
-        if((choice = io_getInteger()) < 1 || choice > 2)
+        printf("Quanti alberi vuoi generare?: ");
+        if((n_trees = io_getInteger()) < 1)
             printf("ATTENZIONE: Valore non valido\n\n");
-    }while(choice < 1 || choice > 2);
-    printf("\n");    
-    do  {
-        printf("Quanti alberi vuoi generare? (>1): ");
-        if((n_trees = io_getInteger()) < 2) //si possono inserire almeno 2 alberi
-            printf("ATTENZIONE: Valore non valido\n\n");
-    }while(n_trees < 2);
+    }while(n_trees < 1);
     printf("\n");
-    if(choice == 1) {
+    do  {
+        printf("Numero fisso o numero variabile di nodi fra gli alberi?\n\t1. Fisso\t2. Variabile: ");
+        if((choiceMode = io_getInteger()) < 1 || choiceMode > 2)
+            printf("ATTENZIONE: Valore non valido\n\n");
+    }while(choiceMode < 1 || choiceMode > 2);
+    printf("\n");
+    if(choiceMode == 1) {
         do  {
-            printf("Quanti nodi vuoi inserire nei %d alberi? (>1): ", n_trees);
-            if((n_nodes = io_getInteger()) < 2) //si possono inserire almeno 2 nodi
+            printf("Quanti nodi vuoi inserire negli alberi?: ");
+            if((n_nodes_A = io_getInteger()) < 1)
                 printf("ATTENZIONE: Valore non valido\n\n");
-        }while(n_nodes < 2);
-        printf("\n\n");
-        treeABR_average(n_trees, n_nodes);
-    } else if(choice == 2)  {
-        int exp;
-        for(exp=1;exp<=10;exp++)
-            treeABR_average(n_trees, pow(2,exp));
+        }while(n_nodes_A < 1);
+    } else if(choiceMode == 2)  {
+        do  {
+            printf("Quale numero MINIMO di nodi vuoi inserire negli alberi?: ");
+            if((n_nodes_A = io_getInteger()) < 1)
+                printf("ATTENZIONE: Valore non valido\n\n");
+        }while(n_nodes_A < 1);
+        printf("\n");
+        do  {
+            printf("Quale numero MASSIMO di nodi vuoi inserire negli alberi?: ");
+            if((n_nodes_B = io_getInteger()) < n_nodes_A)
+                printf("ATTENZIONE: Valore non valido\n\n");
+        }while(n_nodes_B < n_nodes_A);
     }
+    treeABR_average(n_trees, n_nodes_A, n_nodes_B);
 }
 
 //Unione di due alberi, con eliminazione di elementi duplicati
@@ -261,11 +267,8 @@ void treeABR_func_deleteKey(TREE albero) {
 
     treeABR_deleteKey(albero, val);
     printf("\n");
-    if(*albero) {
-        treeABR_postOrder_h(albero); //aggiornamento delle altezze dell'albero aggiornato
-        treeABR_func_print(albero);
-    } else
-        printf("Albero eliminato\n");
+    treeABR_postOrder_h(albero); //aggiornamento delle altezze dell'albero aggiornato
+    treeABR_func_print(albero);
 }
 
 //Eliminazione con conferma dell'Albero

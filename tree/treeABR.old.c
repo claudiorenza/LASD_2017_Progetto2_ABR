@@ -108,18 +108,24 @@ void treeABR_nodeFree(TREEel albero_curr)	{
 
 
 //Calcolo altezza media per alberi molteplici
-void treeABR_average(int n_trees, int n_nodes)	{
-	int idx_trees, idx_nodes, h_sum = 0;
+void treeABR_average(int n_trees, int n_nodes_A, int n_nodes_B)	{
+	int idx_trees, idx_nodes, h_sum = 0, n_nodes, n_nodes_sum = 0;
 	TREEel albero = NULL;
 	for(idx_trees=0;idx_trees<n_trees;idx_trees++)	{	//ciclo per il numero di alberi
-		for(idx_nodes=0;idx_nodes<n_nodes;idx_nodes++)	//inserisco n_nodes nodi
+		if(n_nodes_B)		//se ho stabilito un margine minimo e massimo del numero di nodi
+			n_nodes_sum = n_nodes_sum + (n_nodes = random_num(n_nodes_A, n_nodes_B));	//genero un valore casuale di nodi compreso tra A e B
+		else
+			n_nodes = n_nodes_A;
+		for(idx_nodes=0;idx_nodes<n_nodes;idx_nodes++)	//inserisco n_nodes_A nodi
 			while(treeABR_insertKey(&albero, random_num(1, INT_MAX)));	//inserisce un valore casuale compreso fra 1 e INT_MAX, senza duplicati
 		treeABR_postOrder_h(&albero);	//inserisco le altezze nell'albero
 		h_sum = h_sum + albero->h;	//somma delle altezze degli alberi
 		treeABR_delete(&albero);	//cancello l'albero per crearne uno nuovo
 	}
-	
-	printf("Altezza media degli alberi con %d nodi: %.3f\n\n", n_nodes, (float)h_sum / (float)n_trees);
+	printf("\n\n");
+	if(n_nodes_B)
+		printf("Numero medio di nodi negli alberi: %.3f\n", (float)n_nodes_sum / (float)n_trees);
+	printf("Altezza media degli alberi: %.3f\n\n", (float)h_sum / (float)n_trees);
 }
 
 //Unione di due alberi in maniera efficiente

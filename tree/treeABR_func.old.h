@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <ctype.h>
-#include <math.h>
 #include "../io/io.h"
 #include "../io/random.h"
 #include "treeABR.h"
@@ -31,7 +30,6 @@ void treeABR_func_deleteKey(TREE albero);
 void treeABR_func_delete(TREE albero);
 
 void treeABR_func_print(TREE albero);
-void treeABR_func_print_preOrder(TREE albero);
 
 
 #endif
