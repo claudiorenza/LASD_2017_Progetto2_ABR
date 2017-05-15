@@ -10,7 +10,7 @@ int main()  {
 	
 	do	{
 		io_clearScreen();
-		printf("\t\t\tProgetto 2 - Gruppo 32 - MENU INTRODUTTIVO\n");
+		printf("\t\tProgetto 2 - Gruppo 32 - MENU INTRODUTTIVO\n");
 
 		printf("1. Calcolo altezza media degli alberi\n");
 		printf("2. Merge di due alberi\n");
